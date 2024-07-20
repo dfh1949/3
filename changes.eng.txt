@@ -34,7 +34,7 @@ After manual NVRAM reset:
 
                               LIST OF CHANGES
 
-3.X.3.9-099:
+5.X.5.0-2024:
 ----------------------------------------------------------
 [RT-AC1200]
 - Added support the MT7628 SoC.
@@ -64,7 +64,7 @@ After manual NVRAM reset:
 - WebUI: add support SD card and SATA control.
 
 
-3.X.3.9-098:
+5.X.5.0-2024:
 ----------------------------------------------------------
 [RT-N56U_B1]
 - Wireless drivers: updated MT7603E AP driver to 4.0.1.0_rev2.
@@ -88,7 +88,7 @@ After manual NVRAM reset:
 - WebUI: removed bogus safe login logic for AP mode.
 
 
-3.X.3.9-097:
+5.X.5.0-2024:
 ----------------------------------------------------------
 [RT-N56U_B1]
 - Fixed swap WAN and LAN front LEDs.
@@ -143,7 +143,7 @@ After manual NVRAM reset:
 - WebUI: allow to edit last deleted row values.
 
 
-3.X.3.9-095:
+5.X.5.0-2024:
 ----------------------------------------------------------
 [RT-N56U_B1]
 - Added support MT7621 SoC.
@@ -200,7 +200,7 @@ After manual NVRAM reset:
 - Fixed WPS/Wi-Fi buttons event handler, limiting short-press detection pulse to 500ms.
 
 
-3.X.3.9-091:
+5.X.5.0-2024:
 ----------------------------------------------------------
 [RT-N11P]
 - Fixed broken L2TP client/server on nano build (pppd plugin issue).
