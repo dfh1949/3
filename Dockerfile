@@ -1,6 +1,6 @@
 FROM ubuntu:bionic
 
-MAINTAINER hanwckf <hanwckf@vip.qq.com>
+MAINTAINER jinenge <jinenge@foxmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -23,5 +23,5 @@ RUN echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen && locale-gen
 ENV LANG en_US.utf8
 
 # See https://github.com/hanwckf/padavan-toolchain/releases
-ADD mipsel-linux-uclibc.tar.xz /opt/rt-n56u/toolchain-mipsel/toolchain-3.4.x
+ADD mipsel-linux-uclibc.tar.xz /opt/rt-n56u/toolchain-mipsel/toolchain-5.0.x
 
