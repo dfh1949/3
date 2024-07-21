@@ -1,204 +1,181 @@
-![CI](https://github.com/hanwckf/rt-n56u/workflows/CI/badge.svg)
-![GitHub All Releases](https://img.shields.io/github/downloads/hanwckf/rt-n56u/total)
-[![release](https://img.shields.io/github/release/hanwckf/rt-n56u.svg)](https://github.com/hanwckf/rt-n56u/releases)
+padavan 中文
+=====
 
-# README #
+简体中文 & 路由器适配
 
-Welcome to the rt-n56u project
+[![GitHub release](https://img.shields.io/github/release/gorden5566/padavan.svg)](https://github.com/gorden5566/padavan/releases)
 
-This project aims to improve the rt-n56u and other supported devices on the software part, allowing power user to take full control over their hardware.
-This project was created in hope to be useful, but comes without warranty or support. Installing it will probably void your warranty. 
-Contributors of this project are not responsible for what happens next.
+------
 
-### How do I get set up? ###
+padavan 是一个优秀的路由器固件，支持采用 RT3883/MT7620/MT7621/MT7628 等系列 CPU 的路由器
 
-* [Get the tools to build the system](https://bitbucket.org/padavan/rt-n56u/wiki/EN/HowToMakeFirmware) or [Download pre-built system image](https://bitbucket.org/padavan/rt-n56u/downloads)
-* Feed the device with the system image file (Follow instructions of updating your current system)
-* Perform factory reset
-* Open web browser on http://my.router to configure the services
+## 说明
 
-### Contribution guidelines ###
+本项目旨在使 padavan 实现更好的中文本地化，以方便更多的用户
 
-* To be completed
+项目主要包含两部分：简体中文 dict 文件，部分常见路由器的适配文件
 
-***
+已适配的路由器型号如下：
 
-### 特别说明 ###
-* 汉化字典来自：https://github.com/gorden5566/padavan
-* 更新日志：https://www.jianshu.com/p/d76a63a12eae
+- 联想 newifi mini (NEWIFI-MINI)
 
-***
+- 联想 newifi2 (NEWIFI-D1)
 
-### 固件特点 ###
-- 使用[gorden5566](https://github.com/gorden5566/padavan)的汉化字典
-- aria2前端更换为[AriaNg](https://github.com/mayswind/AriaNg)
-- [curl](https://github.com/curl/curl)可选编译可执行程序 ```CONFIG_FIRMWARE_INCLUDE_CURL```
-- 使用了[PROMETHEUS](http://pm.freize.net/index.html)提供的部分补丁
-- 使用了[Linaro1985/padavan-ng](https://gitlab.com/padavan-ng/padavan-ng)的部分软件包
-- 可选以下插件：
->- [scutclient](https://github.com/hanwckf/scutclient) ```CONFIG_FIRMWARE_INCLUDE_SCUTCLIENT```
->- [gdut-drcom](https://github.com/chenhaowen01/gdut-drcom) ```CONFIG_FIRMWARE_INCLUDE_GDUT_DRCOM```
->- [dogcom](https://github.com/hanwckf/dogcom) ```CONFIG_FIRMWARE_INCLUDE_DOGCOM```
->- [minieap](https://github.com/hanwckf/minieap) ```CONFIG_FIRMWARE_INCLUDE_MINIEAP```
->- [njit-client](https://github.com/hanwckf/njit8021xclient) ```CONFIG_FIRMWARE_INCLUDE_NJIT_CLIENT```
->- [napt66](https://github.com/mzweilin/napt66) ```CONFIG_FIRMWARE_INCLUDE_NAPT66```
->- [softether-vpnserver](https://github.com/SoftEtherVPN/SoftEtherVPN_Stable) ```CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER```
->- [softether-vpnclient](https://github.com/SoftEtherVPN/SoftEtherVPN_Stable) ```CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT```
->- [softether-vpncmd](https://github.com/SoftEtherVPN/SoftEtherVPN_Stable) ```CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD```
->- [vlmcsd](https://github.com/hanwckf/vlmcsd) ```CONFIG_FIRMWARE_INCLUDE_VLMCSD```
->- [ttyd](https://github.com/tsl0922/ttyd) ```CONFIG_FIRMWARE_INCLUDE_TTYD```
->- [lrzsz](https://ohse.de/uwe/software/lrzsz.html) ```CONFIG_FIRMWARE_INCLUDE_LRZSZ```
->- [htop](https://hisham.hm/htop/releases/) ```CONFIG_FIRMWARE_INCLUDE_HTOP```
->- [nano](https://www.nano-editor.org/dist/) ```CONFIG_FIRMWARE_INCLUDE_NANO```
->- [iperf3](https://github.com/esnet/iperf) ```CONFIG_FIRMWARE_INCLUDE_IPERF3```
->- [dump1090](https://github.com/hanwckf/dump1090) ```CONFIG_FIRMWARE_INCLUDE_DUMP1090```
->- [rtl-sdr](https://github.com/osmocom/rtl-sdr) ```CONFIG_FIRMWARE_INCLUDE_RTL_SDR```
->- [samba3.6](https://gitlab.com/padavan-ng/padavan-ng/tree/master/trunk/user/samba36) ```CONFIG_FIRMWARE_INCLUDE_SMBD36```
->- [mtr](https://github.com/traviscross/mtr) ```CONFIG_FIRMWARE_INCLUDE_MTR```
->- [socat](http://www.dest-unreach.org/socat) ```CONFIG_FIRMWARE_INCLUDE_SOCAT```
->- [srelay](https://socks-relay.sourceforge.io) ```CONFIG_FIRMWARE_INCLUDE_SRELAY```
->- [3proxy](https://github.com/z3APA3A/3proxy) ```CONFIG_FIRMWARE_INCLUDE_3PROXY```
->- [mentohust](https://github.com/hanwckf/mentohust-1) ```CONFIG_FIRMWARE_INCLUDE_MENTOHUST```
->- [frpc](https://github.com/fatedier/frp) ```CONFIG_FIRMWARE_INCLUDE_FRPC```
->- [frps](https://github.com/fatedier/frp) ```CONFIG_FIRMWARE_INCLUDE_FRPS```
->- [tunsafe](https://github.com/TunSafe/TunSafe) ```CONFIG_FIRMWARE_INCLUDE_TUNSAFE```
->- [wireguard-go](https://git.zx2c4.com/wireguard-go/) ```CONFIG_FIRMWARE_INCLUDE_WIREGUARD```
->- [smartdns](https://github.com/pymumu/smartdns) ```CONFIG_FIRMWARE_INCLUDE_SMARTDNS```
+- 联想 newifi y1s (NEWIFI-Y1S)
 
-- 已适配除官方适配外的以下机型
->- PSG1208
->- PSG1218
->- 5K-W20 (USB)
->- OYE-001 (USB)
->- NEWIFI-MINI (USB)
->- MI-MINI (USB)
->- MI-3 (USB)
->- MI-3C
->- MI-4
->- MI-R3G (USB)
->- MI-R4A
->- MI-R3P (USB)
->- HC5661A
->- HC5761A (USB)
->- HC5861B
->- 360P2 (USB)
->- MI-NANO
->- MZ-R13
->- MZ-R13P
->- RT-AC1200GU (USB)
->- XY-C1 (USB)
->- WR1200JS (USB)
->- NEWIFI3 (USB)
->- B70 (USB)
->- A3004NS (USB)
->- K2P
->- K2P-USB (USB)
->- JCG-836PRO (USB)
->- JCG-AC860M (USB)
->- DIR-882 (USB)
->- DIR-878
->- MR2600 (USB)
->- WDR7300
->- RM2100
->- CR660x (CR6606, CR6608, CR6609)
->- R2100
->- JCG-Y2 (USB)
->- E8820V2 (USB)
->- ZTE_E8820S (USB)
->- MSG1500 (USB)
->- R6220 (USB)
->- NETGEAR-CHJ (R6260, R6350, R6850, WAC124)
->- NETGEAR-BZV (R6800, R6700-v2, R7200, Nighthawk AC2400)
+- 优酷路由宝 L1 (YK-L1)
 
-***
+- 斐讯 K2 (PSG1218)
 
-### 编译说明 ###
+------
 
-* 安装依赖包
+![image](https://github.com/gorden5566/padavan/raw/master/screenshot/index.png)
 
-```shell
-# Debian/Ubuntu
-sudo apt update
-sudo apt install unzip libtool-bin curl cmake gperf gawk flex bison nano xxd \
-	fakeroot kmod cpio git python3-docutils gettext automake autopoint \
-	texinfo build-essential help2man pkg-config zlib1g-dev libgmp3-dev \
-	libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget libc-dev-bin
+## 使用方法
 
-# Archlinux/Manjaro
-sudo pacman -Syu --needed git base-devel cmake gperf ncurses libmpc \
-        gmp python-docutils vim rpcsvc-proto fakeroot cpio help2man
+### 使用编译好的固件
 
-# Alpine
-sudo apk add make gcc g++ cpio curl wget nano xxd kmod \
-	pkgconfig rpcgen fakeroot ncurses bash patch \
-	bsd-compat-headers python2 python3 zlib-dev \
-	automake gettext gettext-dev autoconf bison \
-	flex coreutils cmake git libtool gawk sudo
+提供部分已编译好的固件 (**仅供测试**)，仅针对路由器进行适配并加入简体中文。
 
-# CentOS 7
-sudo yum update
-sudo yum groupinstall "Development Tools"
-sudo yum install ncurses-* flex byacc bison zlib-* texinfo gmp-* mpfr-* gettext \
-	libtool* libmpc-* gettext-* python-docutils nano help2man fakeroot
+可直接下载对应型号固件，通过 uboot 或 breed 刷入（**请务必确保与路由器型号一致**）。
 
-# CentOS 8
-sudo yum update
-sudo yum groupinstall "Development Tools"
-sudo yum install ncurses-* flex byacc bison zlib-* gmp-* mpfr-* gettext \
-	libtool* libmpc-* gettext-* nano fakeroot
+固件下载地址: http://pan.baidu.com/s/1o8jLp9o 密码: 4y9d
 
-# CentOS 8不能直接通过yum安装texinfo，help2man，python-docutils。请去官网下载发行的安装包编译安装
-# 以texinfo为例
-# cd /usr/local/src
-# sudo wget http://ftp.gnu.org/gnu/texinfo/texinfo-6.7.tar.gz
-# sudo tar zxvf texinfo-6.7.tar.gz
-# cd texinfo-6.7
-# sudo ./configure
-# sudo make
-# sudo make install
+### 手动编译固件
 
+若需要更多定制功能，请自己修改源码编译固件。
+
+## 编译步骤
+
+### 环境准备
+
+官方建议使用 ubuntu 16.04 LTS，你也可以使用 debian 衍生的其他 Linux 系统。
+
+安装 git
+``` bash
+sudo apt-get update
+sudo apt-get install git
 ```
 
-* 克隆源码
-
-```shell
-git clone --depth=1 https://e.coding.net/hanwckf/rt-n56u/padavan.git /opt/rt-n56u
-#git clone --depth=1 https://github.com/hanwckf/rt-n56u.git /opt/rt-n56u
+安装依赖
+``` bash
+sudo apt-get install autoconf automake autopoint bison build-essential flex gawk gettext git gperf libtool pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev texinfo python-docutils
 ```
 
-* 准备工具链
+### 获取 padavan 固件源码
 
-```shell
+``` bash
+cd /opt
+sudo git clone https://bitbucket.org/padavan/rt-n56u
+```
+如果下载比较慢，也可以从 oschina 镜像下载
+``` bash
+cd /opt
+sudo git clone https://gitee.com/gorden5566/rt-n56u.git
+```
+
+### 安装简体中文
+
+下载简体中文源码
+``` bash
+cd ~/
+git clone https://github.com/gorden5566/padavan.git
+```
+
+安装
+``` bash
+cd ~/padavan
+sudo sh ./install.sh
+```
+依次输入 1 和 2 复制文件到项目目录
+
+### 编译交叉编译工具链
+
+交叉编译工具链只需要编译一次即可
+``` bash
 cd /opt/rt-n56u/toolchain-mipsel
-
-# （推荐）使用脚本下载预编译的工具链：
-sh dl_toolchain.sh
-
-# 或者，也可以从源码编译工具链，这需要一些时间：
-./clean_toolchain
-./build_toolchain
-
+sudo ./clean_sources
+sudo ./build_toolchain
 ```
 
-* (可选) 修改机型配置文件
+### 配置修改
 
-```shell
-nano /opt/rt-n56u/trunk/configs/templates/PSG1218.config
+#### 方法一： 手动编辑 `/opt/rt-n56u/trunk/.config`
+
+修改路由器型号相关配置(例如 NEWIFI-D1)
+```
+### Target Vendor/Product (support only Ralink RT3883/MT7620/MT7621/MT7628)
+CONFIG_VENDOR=Ralink
+CONFIG_PRODUCT=MT7621
+
+### Target ProductID (board select, max 12 symbols)
+CONFIG_FIRMWARE_PRODUCT_ID="NEWIFI-D1"
 ```
 
-* 开始编译
+修改语言配置
+```
+CONFIG_FIRMWARE_INCLUDE_LANG_CN=y
+```
 
-```shell
+#### 方法二： 使用编辑好的配置文件
+
+``` bash
+cd /opt/rt-n56u/trunk/
+sudo cp configs/templates/newifi_d1_full.config .config
+```
+
+### 编译固件
+
+执行如下命令编译固件
+``` bash
 cd /opt/rt-n56u/trunk
-# 对于WSL环境，建议使用sudo进行编译，或者使用fakeroot-tcp代替fakeroot
-fakeroot ./build_firmware_modify PSG1218
-# 脚本第一个参数为路由型号，在trunk/configs/templates/中
-# 编译好的固件在trunk/images里
-# 首次编译完成后，如果需要再次编译其它固件，需要执行清理脚本：
-./clear_tree
+sudo ./clear_tree
+sudo ./build_firmware
 ```
 
-***
+## 文件说明
+
+```
+├── configs
+│   ├── boards
+│   │   └── NEWIFI-D1 ---newifi-d1适配文件
+│   │       ├── board.h
+│   │       ├── board.mk
+│   │       ├── kernel-3.4.x.config
+│   │       └── libc.config -> ../uclibc-mipsel.config
+│   └── templates
+│       ├── newifi_d1_base.config ---newifi-d1简版配置
+│       └── newifi_d1_full.config ---newifi-d1完整版配置
+└── user
+    └── www
+        ├── dict
+        │   └── CN.dict ---简体中文语言文件
+        └── Makefile
+```
+
+## 贡献列表
+
+详见 [contributors](https://github.com/gorden5566/padavan/graphs/contributors)
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://gorden5566.com/"><img src="https://avatars.githubusercontent.com/u/5310625?v=4?s=100" width="100px;" alt=""/><br /><sub><b>gorden5566</b></sub></a><br /><a href="https://github.com/gorden5566/padavan/commits?author=gorden5566" title="Code">💻</a></td>
+    <td align="center"><a href="https://www.dfki.de/en/web/about-us/employee/person/hoxu01/"><img src="https://avatars.githubusercontent.com/u/12478523?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Hongfei Xu</b></sub></a><br /><a href="https://github.com/gorden5566/padavan/commits?author=hfxunlp" title="Code">💻</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+## 关注趋势
+
+[![Stargazers over time](https://starchart.cc/gorden5566/padavan.svg)](https://starchart.cc/gorden5566/padavan)
+
 
 ### 请参阅 ###
 - https://www.jianshu.com/p/cb51fb0fb2ac
