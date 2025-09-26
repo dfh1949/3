@@ -1,74 +1,124 @@
-name: CI
+name: Padavan CI 固件编译
 
-# Controls when the action will run. 
-on: 
+on:
   push:
   pull_request:
   workflow_dispatch:
     inputs:
       debug_enabled:
-        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'     
+        description: '启用 tmate 调试模式 (https://github.com/marketplace/actions/debugging-with-tmate)'
         required: false
         default: 'no'
   release:
     types: [published]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
-    name: build
-    runs-on: ubuntu-20.04
+    # 任务名称：编译 - 设备型号
+    name: 编译-${{ matrix.targets }}
+    # 切换到最新的 Ubuntu Runner
+    runs-on: ubuntu-latest 
     if: ${{ !(github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) }}
     env:
       build_variant: ${{ matrix.build_variant }}
       targets: ${{ matrix.targets }}
       images_dir: /opt/images
+      # 增加环境路径，简化后续脚本调用
+      PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/opt/padavan/trunk/toolchain-mipsel/toolchain-3.4.x/bin
+      
     strategy:
       matrix:
         include:
           - build_variant: "mt7620"
             targets: "RT-N11P"
+            
+    permissions:
+      contents: write 
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Prepare environment
+      - name: 检出 Padavan 源码
+        uses: actions/checkout@v4
+
+      - name: 安装依赖软件 (加速)
         run: |
           sudo apt update
-          sudo apt install libtool-bin gperf python3-docutils autopoint gettext
-      - name: Run shellcheck
-        run: sh ./trunk/tools/shellcheck.sh
-      - name: Prepare toolchain
+          sudo apt install -y build-essential libtool-bin curl cmake gawk flex bison xxd fakeroot cpio git python3-docutils gettext autopoint texinfo help2man pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget
+          sudo timedatectl set-timezone "Asia/Shanghai"
+
+      # 关键修复：解决 OpenSSL 编译时的 /bin/sh 兼容性问题
+      - name: 修复 Shell 兼容性
+        run: |
+          echo "强制将 /bin/sh 指向 /bin/bash 以修复 OpenSSL 编译错误。"
+          sudo rm -f /bin/sh
+          sudo ln -s /bin/bash /bin/sh
+          ls -l /bin/sh
+
+      - name: 准备工具链
         run: |
           cd toolchain-mipsel
-          sh dl_toolchain.sh
-      - name: Setup tmate session
+          chmod +x dl_toolchain.sh
+          ./dl_toolchain.sh
+          
+      - name: 运行 shellcheck 检查
+        run: sh ./trunk/tools/shellcheck.sh
+
+      - name: 建立 tmate 调试会话
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled == 'yes' }}
         with:
           limit-access-to-actor: true
-      - name: Start build
+
+      - name: 开始编译固件
+        id: compile 
         run: |
           cd trunk
           mkdir -p ${images_dir}
-          for m in $targets; do fakeroot ./build_firmware_ci $m; \
-          if [ $? = 0 ]; then cp -f images/*.trx ${images_dir}/$m.trx; else exit 1; fi; \
-          ./clear_tree_simple >/dev/null 2>&1; done
-      - name: Create archive
+          
+          /bin/bash -c "
+            for m in $targets; do 
+              echo \"--- 开始编译 $m ---\"
+              fakeroot ./build_firmware_ci $m 
+              
+              if [ \$? -eq 0 ]; then
+                cp -f images/*.trx ${images_dir}/$m.trx
+                ./clear_tree_simple >/dev/null 2>&1
+              else
+                echo \"$m 编译失败!\"
+                exit 1 
+              fi
+            done
+          "
+          echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
+
+      - name: 创建归档文件并设置镜像名称
         if: ${{ github.event_name != 'release' && success() }}
         run: |
           ls -lh ${images_dir}
-          GIT_VERSION=`git rev-parse --short=7 HEAD 2>/dev/null` && [ -n "$GIT_VERSION" ] && \
-          image_name=images_${build_variant}_${GIT_VERSION} || image_name=images_${build_variant}
-          cd ${images_dir}; md5sum *.trx |tee md5sum.txt; 7z a -mx=9 ${image_name}.7z ./*
-          echo "image_name=${image_name}" >> $GITHUB_ENV
-      - name: Upload images to Artifact
+          GIT_VERSION=$(git rev-parse --short=7 HEAD 2>/dev/null)
+          if [ -n "$GIT_VERSION" ]; then
+            image_name="images_${build_variant}_${GIT_VERSION}"
+          else
+            image_name="images_${build_variant}"
+          fi
+          
+          cd ${images_dir}
+          md5sum *.trx | tee md5sum.txt
+          # 使用 7z 高强度压缩固件
+          7z a -mx=9 "${image_name}.7z" ./*
+
+          echo "IMAGE_NAME_WITH_HASH=${image_name}" >> $GITHUB_ENV
+          
+      - name: 上传固件到 Artifacts
         if: ${{ github.event_name != 'release' && success() }}
-        uses: actions/upload-artifact@v2.2.1
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.image_name }}
+          name: ${{ env.IMAGE_NAME_WITH_HASH }}
           path: ${{ env.images_dir }}/*.7z
-      - name: Upload images to Releases
+          if-no-files-found: error
+          
+      - name: 上传固件到 Releases
         if: ${{ github.event_name == 'release' && success() }}
-        uses: svenstaro/upload-release-action@2.2.0
+        uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ env.images_dir }}/*.trx
