@@ -15,7 +15,7 @@ on:
 jobs:
   build:
     name: 编译任务  # 任务名称
-    runs-on: ubuntu-20.04  # 使用的操作系统环境
+    runs-on: ubuntu-latest  # 使用的操作系统环境
     if: ${{ !(github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) }}  # 排除标签推送的情况
     env:
       build_variant: ${{ matrix.build_variant }}  # 构建变体（如mt7620）
