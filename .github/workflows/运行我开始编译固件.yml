@@ -1,127 +1,95 @@
-name: Padavan CI 固件编译
+name: CI  # 定义工作流名称
 
 on:
-  push:
-  pull_request:
-  workflow_dispatch:
+  push:  # 在push事件时触发
+  pull_request:  # 在拉取请求时触发
+  workflow_dispatch:  # 支持手动触发
     inputs:
-      debug_enabled:
-        description: '启用 tmate 调试模式 (https://github.com/marketplace/actions/debugging-with-tmate)'
+      debug_enabled:  # 用于调试模式启用
+        description: '启用tmate调试（https://github.com/marketplace/actions/debugging-with-tmate）' 
         required: false
         default: 'no'
   release:
-    types: [published]
+    types: [published]  # 在发布新版本时触发
 
 jobs:
   build:
-    # 任务名称：编译 - 设备型号
-    name: 编译-${{ matrix.targets }}
-    # 切换到最新的 Ubuntu Runner
-    runs-on: ubuntu-latest 
-    if: ${{ !(github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) }}
+    name: 编译任务  # 任务名称
+    runs-on: ubuntu-20.04  # 使用的操作系统环境
+    if: ${{ !(github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) }}  # 排除标签推送的情况
     env:
-      build_variant: ${{ matrix.build_variant }}
-      targets: ${{ matrix.targets }}
-      images_dir: /opt/images
-      # 增加环境路径，简化后续脚本调用
-      PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/opt/padavan/trunk/toolchain-mipsel/toolchain-3.4.x/bin
-      
+      build_variant: ${{ matrix.build_variant }}  # 构建变体（如mt7620）
+      targets: ${{ matrix.targets }}  # 目标设备（如RT-N11P）
+      images_dir: /opt/images  # 固件存放目录
+
     strategy:
       matrix:
         include:
-          - build_variant: "mt7620"
-            targets: "RT-N11P"
-            
-    permissions:
-      contents: write 
+          - build_variant: "mt7620"  # 支持的芯片类型
+            targets: "RT-N11P"  # 支持的设备类型
 
     steps:
-      - name: 检出 Padavan 源码
-        uses: actions/checkout@v4
+      - name: 检出源码
+        uses: actions/checkout@v2  # 使用GitHub官方的检出动作
 
-      - name: 安装依赖软件 (加速)
+      - name: 准备环境
         run: |
-          sudo apt update
-          sudo apt install -y build-essential libtool-bin curl cmake gawk flex bison xxd fakeroot cpio git python3-docutils gettext autopoint texinfo help2man pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget
-          sudo timedatectl set-timezone "Asia/Shanghai"
+          sudo apt update -qq  # 更新APT索引
+          sudo apt install -y libtool-bin gperf python3-docutils autopoint gettext  # 安装依赖
 
-      # 关键修复：解决 OpenSSL 编译时的 /bin/sh 兼容性问题
-      - name: 修复 Shell 兼容性
-        run: |
-          echo "强制将 /bin/sh 指向 /bin/bash 以修复 OpenSSL 编译错误。"
-          sudo rm -f /bin/sh
-          sudo ln -s /bin/bash /bin/sh
-          ls -l /bin/sh
+      - name: 运行shellcheck检查
+        run: sh ./trunk/tools/shellcheck.sh  # 检查shell脚本的语法
 
       - name: 准备工具链
         run: |
           cd toolchain-mipsel
-          chmod +x dl_toolchain.sh
-          ./dl_toolchain.sh
-          
-      - name: 运行 shellcheck 检查
-        run: sh ./trunk/tools/shellcheck.sh
+          sh dl_toolchain.sh  # 下载工具链
 
-      - name: 建立 tmate 调试会话
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled == 'yes' }}
+      - name: 设置tmate调试会话
+        uses: mxschmitt/action-tmate@v3  # 启动tmate调试会话
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled == 'yes' }}  # 仅在手动触发且调试模式启用时运行
         with:
-          limit-access-to-actor: true
+          limit-access-to-actor: true  # 限制仅当前用户访问
 
-      - name: 开始编译固件
-        id: compile 
+      - name: 启动编译
         run: |
           cd trunk
-          mkdir -p ${images_dir}
-          
-          /bin/bash -c "
-            for m in $targets; do 
-              echo \"--- 开始编译 $m ---\"
-              fakeroot ./build_firmware_ci $m 
-              
-              if [ \$? -eq 0 ]; then
-                cp -f images/*.trx ${images_dir}/$m.trx
-                ./clear_tree_simple >/dev/null 2>&1
-              else
-                echo \"$m 编译失败!\"
-                exit 1 
-              fi
-            done
-          "
-          echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
+          mkdir -p ${images_dir}  # 创建存放固件的目录
+          for m in $targets; do 
+            fakeroot ./build_firmware_ci $m  # 使用fakeroot构建固件
+            if [ $? = 0 ]; then 
+              cp -f images/*.trx ${images_dir}/$m.trx  # 编译成功则复制到输出目录
+            else
+              exit 1  # 编译失败则退出
+            fi
+            ./clear_tree_simple >/dev/null 2>&1  # 清理构建目录
+          done
 
-      - name: 创建归档文件并设置镜像名称
-        if: ${{ github.event_name != 'release' && success() }}
+      - name: 创建归档文件
+        if: ${{ github.event_name != 'release' && success() }}  # 只有在非发布事件且构建成功时执行
         run: |
-          ls -lh ${images_dir}
-          GIT_VERSION=$(git rev-parse --short=7 HEAD 2>/dev/null)
-          if [ -n "$GIT_VERSION" ]; then
-            image_name="images_${build_variant}_${GIT_VERSION}"
-          else
-            image_name="images_${build_variant}"
-          fi
-          
+          ls -lh ${images_dir}  # 查看生成的固件文件
+          GIT_VERSION=`git rev-parse --short=7 HEAD 2>/dev/null` && [ -n "$GIT_VERSION" ] && \
+            image_name=images_${build_variant}_${GIT_VERSION} || image_name=images_${build_variant}
           cd ${images_dir}
-          md5sum *.trx | tee md5sum.txt
-          # 使用 7z 高强度压缩固件
-          7z a -mx=9 "${image_name}.7z" ./*
+          md5sum *.trx | tee md5sum.txt  # 计算md5并保存
+          7z a -mx=9 ${image_name}.7z ./*  # 使用7z压缩固件
+          echo "image_name=${image_name}" >> $GITHUB_ENV  # 设置环境变量
 
-          echo "IMAGE_NAME_WITH_HASH=${image_name}" >> $GITHUB_ENV
-          
-      - name: 上传固件到 Artifacts
-        if: ${{ github.event_name != 'release' && success() }}
-        uses: actions/upload-artifact@v4
+      - name: 上传固件到Artifact
+        if: ${{ github.event_name != 'release' && success() }}  # 只有在非发布事件且构建成功时执行
+        uses: actions/upload-artifact@v2.2.1  # 上传构建产物
         with:
-          name: ${{ env.IMAGE_NAME_WITH_HASH }}
-          path: ${{ env.images_dir }}/*.7z
-          if-no-files-found: error
-          
-      - name: 上传固件到 Releases
-        if: ${{ github.event_name == 'release' && success() }}
-        uses: svenstaro/upload-release-action@v2
+          name: ${{ env.image_name }}  # 使用生成的固件名称作为文件名
+          path: ${{ env.images_dir }}/*.7z  # 上传7z归档文件
+
+      - name: 上传固件到Release
+        if: ${{ github.event_name == 'release' && success() }}  # 仅在发布事件且构建成功时执行
+        uses: svenstaro/upload-release-action@2.2.0  # 上传到GitHub Releases
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ env.images_dir }}/*.trx
-          tag: ${{ github.ref }}
-          overwrite: true
-          file_glob: true
+          repo_token: ${{ secrets.GITHUB_TOKEN }}  # 使用GitHub令牌
+          file: ${{ env.images_dir }}/*.trx  # 上传固件文件
+          tag: ${{ github.ref }}  # 使用当前的Git标签
+          overwrite: true  # 如果文件已存在则覆盖
+          file_glob: true  # 支持文件名通配符
+
